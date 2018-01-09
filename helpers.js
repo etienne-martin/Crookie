@@ -36,7 +36,7 @@ async function sendSlackMessage(message){
     text: message
   };
 
-  return await (await fetch('https://hooks.slack.com/services/' + config.slackId, {
+  return await (await fetch(config.webhookUrl, {
     'method': 'POST',
     'body': JSON.stringify(body),
     'content-type': 'application/json'
