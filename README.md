@@ -3,11 +3,16 @@ A slack bot that sends notifications whenever new crypto is added to Binance, Bi
 
 ## Usage
 
-Create a `config.json` file in the root of the project with your slack webhook URL.
+1. Go on https://api.slack.com/apps and create a new slack app.
+2. In the "Add features and functionality" dropdown, click on "Incoming Webhooks" and turn the feature ON
+3. Click on "Add New Webhook to Workspace" and select the channel where you want your notifications to be delivered.
+4. Scroll down, copy the Webhook URL in your clipboard and keep it for later.
+
+Create a `config.json` file in the root of the project and paste your webhook URL.
 
 ```json
 {
-  "slackId": "T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
+  "webhookUrl": "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
 }
 ```
 
