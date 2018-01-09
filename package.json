@@ -1,0 +1,14 @@
+{
+  "name": "crookie",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Etienne Martin",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "node-fetch": "^1.7.3"
+  }
+}
