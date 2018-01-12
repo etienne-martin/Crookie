@@ -1,5 +1,5 @@
 # Crookie
-A slack bot that sends notifications whenever new crypto is added to Binance, Bithumb, Bitfinex, Bittrex, Polonyx, Bitstamp, GDAX, Huobi, Coinone and Hitbtc.
+A slack bot that sends notifications whenever new cryptocurrency is added to Binance, Bithumb, Bitfinex, Bittrex, Polonyx, Bitstamp, GDAX, Huobi, Coinone and Hitbtc.
 
 ## Usage
 
