@@ -1,7 +1,7 @@
 import * as get from 'lodash/get';
 import * as includes from 'lodash/includes';
 import * as isEmpty from 'lodash/isEmpty';
-import { compareArrays, constructMessage, fetchJSON, sendSlackMessage } from '../helpers';
+import { compareArrays, constructMessage, fetchJSON, IResponse, sendSlackMessage } from '../helpers';
 
 const API_URL = 'https://api.binance.com/api/v1/ticker/allPrices';
 const EXCHANGE = 'Binance';
@@ -10,11 +10,6 @@ const INTERVAL = 10000;
 export interface IData {
   symbol: string;
   price: string;
-}
-
-export interface IResponse {
-  data: IData[];
-  diffs: string[];
 }
 
 function handleData(newData: IData[], latestData: IData[]): string[] {

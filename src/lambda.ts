@@ -9,17 +9,12 @@ import kucoin from './exchanges/kucoin';
 
 interface ITarget {
   name: string;
-  fetch: (latestData: any[]) => Promise<IResponse>;
+  fetch: (latestData: any[]) => Promise<string[]>;
 }
 
 interface IData {
   name: string;
   data: any[];
-}
-
-interface IResponse {
-  data: any[];
-  diffs: string[];
 }
 
 const KEY: string = 'exchanges';
@@ -53,12 +48,9 @@ async function getData(latestData: any): Promise<any> {
   // TODO: Add a setTimeout to cancel a request if any exchanges isn't responding (use axios?)
   // So we can get results from other responding exchanges and only skip the exchanges that are unresponsive
   // TODO: Handle exchange fetch errors
-  const promises: Array<Promise<IData>> = map(targets, async (target: ITarget) => {
-    const res: IResponse = await target.fetch(latestData ? latestData[target.name] : null);
-    return {
-      name: target.name,
-      data: res.data
-    };
+  const promises: Array<Promise<IData>> = map(targets, async ({ fetch, name }) => {
+    const data: string[] = await fetch(latestData ? latestData[name] : null);
+    return { data, name };
   });
 
   const exchangesData: IData[] = await Promise.all(promises);
