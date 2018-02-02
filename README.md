@@ -51,10 +51,10 @@ Build the project and test all the features before submitting your pull request.
 ## Authors
 
 * **Etienne Martin** - *Initial work* - [etiennemartin.ca](http://etiennemartin.ca/)  
-XRB: `xrb_3dmrpbcii5d1mi31u8bep317giq7oyp9jmoihuyizb1ynrhqcod6hxwdprnf`  
+XRB/Nano: `xrb_3dmrpbcii5d1mi31u8bep317giq7oyp9jmoihuyizb1ynrhqcod6hxwdprnf`  
 ETH: `0xe17dc88be6e10ef5c0fdef74fa6388e7f4213b70`
 * **Alex Beauchemin** - *Improvements* - [@AlexBeauchemin](https://github.com/AlexBeauchemin)  
-XRB: `xrb_3dmrpbcii5d1mi31u8bep317giq7oyp9jmoihuyizb1ynrhqcod6hxwdprnf`  
+XRB/Nano: `xrb_14z4m3rpphhbobns4dmt7coqoqoid7h7kp9ejqargontp557jd3a4b43z7oo`  
 ETH: `0x6a25a9566bf6c2D731ab3b1E3CD0B4D1205D5794`
  
 
