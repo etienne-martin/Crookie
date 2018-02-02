@@ -1,6 +1,7 @@
 import * as clone from 'lodash/clone';
 import * as isEmpty from 'lodash/isEmpty';
 import * as pullAll from 'lodash/pullAll';
+import * as uniq from 'lodash/uniq';
 import * as rp from 'request-promise';
 import config from './config';
 
@@ -57,7 +58,7 @@ function getDiff(newData: string[], latestData: string[]): string[] {
 }
 
 export async function handleNewCryptos(exchange, data: string[], latestData: string[], urlBuilder: UrlBuilder): Promise<string[]> {
-  if (!latestData) return data;
+  if (isEmpty(latestData)) return data;
 
   const diffs: string[] = getDiff(data, latestData);
   const message: string = constructMessage(diffs, exchange, urlBuilder);
@@ -70,7 +71,7 @@ export async function handleNewCryptos(exchange, data: string[], latestData: str
   await sendSlackMessage(message);
   console.log(`Slack notification sent successfully for ${exchange}:`, diffs);
 
-  return data;
+  return uniq(data.concat(latestData));
 }
 
 export function randomItem(items) {
