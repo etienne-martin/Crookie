@@ -1,6 +1,7 @@
+import * as isEmpty from 'lodash/isEmpty';
 import * as reduce from 'lodash/reduce';
 import * as uniq from 'lodash/uniq';
-import { fetchJSON, handleNewCryptos } from '../helpers';
+import { fetchJSON, handleNewCryptos} from '../helpers';
 
 const API_URL = 'https://kitchen-4.kucoin.com/v1/market/open/symbols?market=&c=&lang=en_US';
 const EXCHANGE = 'Kucoin';
@@ -41,6 +42,8 @@ function processApiResponse(data: IData[]): string[] {
     const pair: string[] = item.symbol.split('-');
     return sum.concat(pair);
   }, []);
+
+  if (isEmpty(list)) throw new Error(`An error occurred while fetching data from ${EXCHANGE}.`);
 
   return uniq(list);
 }

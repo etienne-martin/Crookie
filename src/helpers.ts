@@ -9,8 +9,8 @@ export interface IResponse {
   diffs: string[];
 }
 
-type UrlBuilder = (currency: string) => string;
-type FetchData = (latestData: string[]) => string[];
+export type UrlBuilder = (currency: string) => string;
+export type FetchData = (latestData: string[]) => Promise<string[]>;
 
 function constructMessage(diffs: string[], exchange: string, urlConstructor: UrlBuilder): string {
   const messages: string[] = [];
