@@ -35,12 +35,12 @@ describe('Retrieving exchanges data', () => {
       assert.notEqual(get(data, 'binance', []).length, 0);
     });
 
-    it('should have a "symbol" property', () => {
-      assert.equal(typeof(get(data, 'binance[0].symbol')), 'string');
+    it('should be an array of string', () => {
+      assert.equal(typeof(get(data, 'binance[0]')), 'string');
     });
 
-    it('should have a "symbol" value', () => {
-      assert.notEqual(get(data, 'binance[0].symbol').length, 0);
+    it('should not be pairings', () => {
+      assert.equal(get(data, 'binance[0]').indexOf('-'), -1);
     });
   });
 
