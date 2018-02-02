@@ -5,15 +5,10 @@ import * as uniq from 'lodash/uniq';
 import * as rp from 'request-promise';
 import config from './config';
 
-export interface IResponse {
-  data: string[];
-  diffs: string[];
-}
-
-export type UrlBuilder = (currency: string) => string;
+export type UrlConstructor = (currency: string) => string;
 export type FetchData = (latestData: string[]) => Promise<string[]>;
 
-function constructMessage(diffs: string[], exchange: string, urlConstructor: UrlBuilder): string {
+function constructMessage(diffs: string[], exchange: string, urlConstructor: UrlConstructor): string {
   const messages: string[] = [];
   const exclamations: string[] = [
     'Yay!',
@@ -52,16 +47,16 @@ export function fetchJSON(uri) {
 }
 
 function getDiff(newData: string[], latestData: string[]): string[] {
-  const diff: string[] = clone(newData); // need to close as pullAll mutate the array
+  const diff: string[] = clone(newData); // need to clone as pullAll mutate the array
   pullAll(diff, latestData);
   return diff;
 }
 
-export async function handleNewCryptos(exchange, data: string[], latestData: string[], urlBuilder: UrlBuilder): Promise<string[]> {
+export async function handleNewCryptos(exchange, data: string[], latestData: string[], urlConstructor: UrlConstructor): Promise<string[]> {
   if (isEmpty(latestData)) return data;
 
   const diffs: string[] = getDiff(data, latestData);
-  const message: string = constructMessage(diffs, exchange, urlBuilder);
+  const message: string = constructMessage(diffs, exchange, urlConstructor);
 
   if (isEmpty(diffs)) {
     console.log(`Nothing changed on ${exchange}.`);
@@ -99,7 +94,7 @@ async function sendSlackMessage(message) {
   }
 }
 
-export async function run(fetchData: FetchData, interval: number = 1000): Promise<void> {
+export async function run(fetchData: FetchData, interval: number = 1000 * 30): Promise<void> {
   try {
     let cryptos: string[] = await fetchData(null);
     let latestData: string[] = cryptos;
