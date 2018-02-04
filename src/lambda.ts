@@ -6,20 +6,22 @@ import config from './config';
 import binance from './exchanges/binance';
 import gdax from './exchanges/gdax';
 import kucoin from './exchanges/kucoin';
+import { FetchData } from './helpers';
 
 interface ITarget {
   name: string;
-  fetch: (latestData: any[]) => Promise<IResponse>;
+  fetch: FetchData;
+}
+
+interface IItem {
+  name: string;
+  data: string[];
 }
 
 interface IData {
-  name: string;
-  data: any[];
-}
-
-interface IResponse {
-  data: any[];
-  diffs: string[];
+  binance: string[];
+  gdax: string[];
+  kucoin: string[];
 }
 
 const KEY: string = 'exchanges';
@@ -49,26 +51,46 @@ async function getLatestData(client: redis.RedisClient): Promise<any> {
   });
 }
 
-async function getData(latestData: any): Promise<any> {
-  // TODO: Add a setTimeout to cancel a request if any exchanges isn't responding (use axios?)
-  // So we can get results from other responding exchanges and only skip the exchanges that are unresponsive
-  // TODO: Handle exchange fetch errors
-  const promises: Array<Promise<IData>> = map(targets, async (target: ITarget) => {
-    const res: IResponse = await target.fetch(latestData ? latestData[target.name] : null);
-    return {
-      name: target.name,
-      data: res.data
-    };
+// Cancel a call after x seconds to make sure we still get data from the lambda even if one exchange isn't responding
+function cancelableFetch(fetch: FetchData, latestData: string[], timeout = 3000): Promise<string[]> {
+  return new Promise(async (resolve, reject) => {
+    const cancelTimeout = setTimeout(() => {
+      reject(new Error('Fetch timed out'));
+    }, timeout);
+
+    try {
+      const data: string[] = await fetch(latestData);
+      clearTimeout(cancelTimeout);
+      resolve(data);
+    } catch (err) {
+      clearTimeout(timeout);
+      reject(err);
+    }
   });
 
-  const exchangesData: IData[] = await Promise.all(promises);
+}
+
+async function getData(latestData: IData): Promise<IData> {
+  const promises: Array<Promise<IItem>> = map(targets, async ({ fetch, name }) => {
+    let data: string[] = null;
+
+    try {
+      data = await cancelableFetch(fetch, latestData ? latestData[name] : null);
+    } catch (err) {
+      console.error(err);
+    }
+
+    return { data, name };
+  });
+
+  const exchangesData: IItem[] = await Promise.all(promises);
   return reduce(exchangesData, (res, item) => {
     res[item.name] = item.data;
     return res;
   }, {});
 }
 
-function saveData(client: redis.RedisClient, key: string, data: any): Promise<void> {
+function saveData(client: redis.RedisClient, key: string, data: IData): Promise<void> {
   return new Promise((resolve, reject) => {
     client.set(key, JSON.stringify(data), (err) => {
       if (err) reject(err);
@@ -88,8 +110,8 @@ export default async function init(callback, defaultClient?: redis.RedisClient):
       callback(err);
     });
 
-    const latestData: any = await getLatestData(client);
-    const data: any = await getData(latestData);
+    const latestData: IData = await getLatestData(client);
+    const data: IData = await getData(latestData);
     await saveData(client, KEY, data);
 
     client.quit();
