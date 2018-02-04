@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import kucoin from '../../dist/exchanges/kucoin';
 
-describe('Retrieving kucoin data', () => {
+describe('Retrieving Kucoin data', () => {
   let data = [];
 
   before(async () => {
