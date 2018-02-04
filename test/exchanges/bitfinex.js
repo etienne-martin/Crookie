@@ -1,14 +1,14 @@
 import * as assert from 'assert';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
-import gdax from '../../dist/exchanges/gdax';
+import bitfinex from '../../dist/exchanges/bitfinex';
 
-describe('Retrieving GDAX data', () => {
+describe('Retrieving Bitfinex data', () => {
   let data = [];
 
   before(async () => {
     try {
-      data = await gdax.fetchData(null);
+      data = await bitfinex.fetchData(null);
     } catch (err) {
       console.error(err);
     }

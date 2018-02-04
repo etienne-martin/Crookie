@@ -73,14 +73,14 @@ export function randomItem(items) {
   return items[Math.floor(Math.random() * items.length)];
 }
 
-export function stripFromEnd(string: string, tokensToRemove: string[]) {
+export function stripFromEnd(source: string, tokensToRemove: string[]) {
   for (const token of tokensToRemove) {
-    if (string.endsWith(token)) {
-      return string.replace(new RegExp(token + '$'), '');
+    if (source.endsWith(token)) {
+      return source.replace(new RegExp(token + '$'), '');
     }
   }
 
-  return string;
+  return source;
 }
 
 async function sendSlackMessage(message) {

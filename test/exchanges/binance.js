@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import binance from '../../dist/exchanges/binance';
 
-describe('Retrieving binance data', () => {
+describe('Retrieving Binance data', () => {
   let data = [];
 
   before(async () => {
@@ -21,10 +21,6 @@ describe('Retrieving binance data', () => {
 
     it('should be an array of string', () => {
       assert.equal(typeof(get(data, '[0]')), 'string');
-    });
-
-    it('should not be pairings', () => {
-      assert.equal(get(data, '[0]').indexOf('-'), -1);
     });
   });
 });

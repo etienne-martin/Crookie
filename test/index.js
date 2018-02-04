@@ -38,10 +38,6 @@ describe('Retrieving exchanges data', () => {
     it('should be an array of string', () => {
       assert.equal(typeof(get(data, 'binance[0]')), 'string');
     });
-
-    it('should not be pairings', () => {
-      assert.equal(get(data, 'binance[0]').indexOf('-'), -1);
-    });
   });
 
   describe('Kucoin', () => {
@@ -65,10 +61,6 @@ describe('Retrieving exchanges data', () => {
 
     it('should be an array of string', () => {
       assert.equal(typeof(get(data, 'gdax[0]')), 'string');
-    });
-
-    it('should not be pairings', () => {
-      assert.equal(get(data, 'gdax[0]').indexOf('-'), -1);
     });
   });
 });
