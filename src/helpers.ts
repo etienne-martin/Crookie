@@ -73,6 +73,16 @@ export function randomItem(items) {
   return items[Math.floor(Math.random() * items.length)];
 }
 
+export function stripFromEnd(string: string, tokensToRemove: string[]) {
+  for (const token of tokensToRemove) {
+    if (string.endsWith(token)) {
+      return string.replace(new RegExp(token + '$'), '');
+    }
+  }
+
+  return string;
+}
+
 async function sendSlackMessage(message) {
   const url = config.get('webhookUrl');
   const options = {
@@ -94,10 +104,13 @@ async function sendSlackMessage(message) {
   }
 }
 
-export async function run(fetchData: FetchData, interval: number = 1000 * 30): Promise<void> {
+export async function run(fetchData: FetchData, interval: number = 1000 * 10): Promise<void> {
   try {
     let cryptos: string[] = await fetchData(null);
     let latestData: string[] = cryptos;
+
+    // Test that errthing's working fine.
+    // latestData.pop();
 
     setInterval(async () => {
       cryptos = await fetchData(latestData);
