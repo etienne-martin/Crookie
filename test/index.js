@@ -6,12 +6,6 @@ import lambda from '../dist/lambda';
 const previousData = {
   binance: [{ symbol: 'ETHBTC' }]
 }
-const fakeRedisClient = {
-  on(e, cb) {},
-  quit() {},
-  get(key, cb) { cb(null, previousData[key]); },
-  set(key, data, cb) { cb(); }
-}
 
 describe('Retrieving exchanges data', () => {
   let data;
@@ -23,7 +17,7 @@ describe('Retrieving exchanges data', () => {
     lambda((err, res) => {
       data = res;
       done();
-    }, fakeRedisClient);
+    });
   });
 
   // describe('Redis', () => {

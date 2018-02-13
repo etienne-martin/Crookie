@@ -1,9 +1,7 @@
-import * as isEmpty from 'lodash/isEmpty';
 import * as map from 'lodash/map';
 import * as reduce from 'lodash/reduce';
-import * as redis from 'redis';
-import config from './config';
 import binance from './exchanges/binance';
+import bitfinex from './exchanges/bitfinex';
 import gdax from './exchanges/gdax';
 import kucoin from './exchanges/kucoin';
 import { FetchData } from './helpers';
@@ -20,46 +18,28 @@ interface IItem {
 
 interface IData {
   binance: string[];
+  bitfinex: string[];
   gdax: string[];
   kucoin: string[];
 }
 
-const KEY: string = 'exchanges';
+let latestData: IData = null;
 const targets: ITarget[] = [
   { name: 'binance', fetch: binance.fetchData },
+  { name: 'bitfinex', fetch: bitfinex.fetchData },
   { name: 'gdax', fetch: gdax.fetchData },
   { name: 'kucoin', fetch: kucoin.fetchData }
 ];
 
-function createRedisClient(): redis.RedisClient {
-  const redisOptions: redis.ClientOpts = {
-    host: config.get('redisUrl'),
-    port: 6379,
-    connect_timeout: 1000
-  };
-
-  return redis.createClient(redisOptions);
-}
-
-async function getLatestData(client: redis.RedisClient): Promise<any> {
-  return new Promise((resolve, reject) => {
-    client.get(KEY, (err, res) => {
-      if (err) reject(err);
-      const data: any = isEmpty(res) ? null : JSON.parse(res);
-      resolve(data);
-    });
-  });
-}
-
 // Cancel a call after x seconds to make sure we still get data from the lambda even if one exchange isn't responding
-function cancelableFetch(fetch: FetchData, latestData: string[], timeout = 3000): Promise<string[]> {
+function cancelableFetch(fetch: FetchData, name: string, timeout = 3000): Promise<string[]> {
   return new Promise(async (resolve, reject) => {
     const cancelTimeout = setTimeout(() => {
-      reject(new Error('Fetch timed out'));
+      reject(new Error('Fetch timed out for ' + name));
     }, timeout);
 
     try {
-      const data: string[] = await fetch(latestData);
+      const data: string[] = await fetch(latestData ? latestData[name] : null);
       clearTimeout(cancelTimeout);
       resolve(data);
     } catch (err) {
@@ -70,12 +50,12 @@ function cancelableFetch(fetch: FetchData, latestData: string[], timeout = 3000)
 
 }
 
-async function getData(latestData: IData): Promise<IData> {
+async function getData(): Promise<IData> {
   const promises: Array<Promise<IItem>> = map(targets, async ({ fetch, name }) => {
     let data: string[] = null;
 
     try {
-      data = await cancelableFetch(fetch, latestData ? latestData[name] : null);
+      data = await cancelableFetch(fetch, name);
     } catch (err) {
       console.error(err);
     }
@@ -90,40 +70,22 @@ async function getData(latestData: IData): Promise<IData> {
   }, {});
 }
 
-function saveData(client: redis.RedisClient, key: string, data: IData): Promise<void> {
-  return new Promise((resolve, reject) => {
-    client.set(key, JSON.stringify(data), (err) => {
-      if (err) reject(err);
-      else resolve();
-    });
-  });
-}
-
-export default async function init(callback, defaultClient?: redis.RedisClient): Promise<void> {
-  let client: redis.RedisClient = defaultClient;
-
+export default async function init(callback): Promise<void> {
   try {
-    if (!client) client = createRedisClient();
-
-    client.on('error', (err) => {
-      client.quit();
-      callback(err);
-    });
-
-    const latestData: IData = await getLatestData(client);
-    const data: IData = await getData(latestData);
-    await saveData(client, KEY, data);
-
-    client.quit();
+    const data: IData = await getData();
+    latestData = data;
     callback(null, data);
   } catch (err) {
     callback(err);
-    if (client) client.quit();
   }
 }
 
 // @ts-ignore
 exports.handler = async function lambda(event, context, callback) {
+  // do not wait until the even loop is empty before freezing the process
+  // https://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
+  context.callbackWaitsForEmptyEventLoop = false;
+
   init((err) => {
     if (err) callback(null, err.message);
     callback(null, 'Done.');
