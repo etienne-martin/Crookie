@@ -35,7 +35,7 @@ You can run the test suite to make sure that everything is working correctly wit
 
 ## Built with
 
-* [node.js](https://github.com/moment/moment) - Node.js is an open-source, cross-platform JavaScript run-time environment for executing JavaScript code server-side.
+* [node.js](https://nodejs.org/en/) - Node.js is an open-source, cross-platform JavaScript run-time environment for executing JavaScript code server-side.
 * [slack](https://api.slack.com/apps) - Slack is a cloud-based set of proprietary team collaboration tools and services.
 * [love](https://en.wikipedia.org/wiki/Love) - Love encompasses a variety of different emotional and mental states, typically strongly and positively experienced, ranging from the deepest interpersonal affection to the simplest pleasure.
 
